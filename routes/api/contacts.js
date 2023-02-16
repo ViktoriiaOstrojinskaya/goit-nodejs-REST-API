@@ -12,10 +12,7 @@ const contactSchema = Joi.object({
       },
     })
     .required(),
-  phone: Joi.string()
-    .length(10)
-    .pattern(/^[0-9]+$/)
-    .required(),
+  phone: Joi.number().integer().required(),
 });
 
 const {
@@ -52,7 +49,7 @@ router.post("/", async (req, res, next) => {
   try {
     const { error } = contactSchema.validate(req.body);
     if (error) {
-      res.status(400).json({ message: "missing required name field" });
+      return res.status(400).json({ message: "missing required name field" });
     }
     const { name, email, phone } = req.body;
     const data = await addContact(name, email, phone);
