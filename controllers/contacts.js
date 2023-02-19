@@ -1,37 +1,12 @@
 const contacts = require("../models/contacts");
 const { HttpError, ctrlWrapper } = require("../helpers");
-const Joi = require("joi");
 
-const newContactSchema = Joi.object({
-  name: Joi.string().alphanum().required(),
-  email: Joi.string()
-    .email({
-      minDomainSegments: 2,
-      tlds: {
-        allow: ["com", "net"],
-      },
-    })
-    .required(),
-  phone: Joi.number().integer().required(),
-});
-
-const updateContactSchema = Joi.object({
-  name: Joi.string().alphanum(),
-  email: Joi.string().email({
-    minDomainSegments: 2,
-    tlds: {
-      allow: ["com", "net"],
-    },
-  }),
-  phone: Joi.number().integer(),
-});
-
-const getAll = async (req, res, next) => {
+const getAll = async (req, res) => {
   const data = await contacts.listContacts();
   res.status(200).json({ contacts: data });
 };
 
-const getById = async (req, res, next) => {
+const getById = async (req, res) => {
   const { contactId } = req.params;
   const data = await contacts.getContactById(contactId);
   if (!data) {
@@ -40,16 +15,12 @@ const getById = async (req, res, next) => {
   res.status(200).json(data);
 };
 
-const postContact = async (req, res, next) => {
-  const { error } = newContactSchema.validate(req.body);
-  if (error) {
-    throw HttpError(400, error.message);
-  }
+const postContact = async (req, res) => {
   const data = await contacts.addContact(req.body);
   res.status(201).json(data);
 };
 
-const deleteById = async (req, res, next) => {
+const deleteById = async (req, res) => {
   const { contactId } = req.params;
   const data = await contacts.removeContact(contactId);
   if (!data) {
@@ -58,12 +29,11 @@ const deleteById = async (req, res, next) => {
   res.status(200).json({ message: "Contact deleted" });
 };
 
-const updateById = async (req, res, next) => {
-  const { error } = updateContactSchema.validate(req.body);
-  if (error) {
-    throw HttpError(400, error.message);
-  }
+const updateById = async (req, res) => {
   const { contactId } = req.params;
+  if (Object.keys(req.body).length === 0) {
+    throw HttpError(404, "Missing fields");
+  }
   const data = await contacts.updateContact(contactId, req.body);
   if (!data) {
     throw HttpError(404, "Not found");
