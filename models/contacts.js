@@ -6,7 +6,7 @@ const contactsPath = path.join(__dirname, "contacts.json");
 
 const listContacts = async () => {
   const data = await fs.readFile(contactsPath, "utf-8");
-  return JSON.parse(data);
+  return JSON.parse(data) || null;
 };
 
 const getContactById = async (contactId) => {
@@ -33,20 +33,20 @@ const addContact = async (body) => {
     ...body,
   };
   data.push(newContact);
-  await fs.writeFile(contactsPath, JSON.stringify(data));
+  await fs.writeFile(contactsPath, JSON.stringify(data, null, 2));
   return newContact;
 };
 
 const updateContact = async (contactId, body) => {
-  const { name, email, phone } = body;
   const data = await listContacts();
-  const [updatedContact] = data.filter((item) => item.id === contactId);
-  updatedContact.name = name;
-  updatedContact.email = email;
-  updatedContact.phone = phone;
-  const newContact = [...data];
-  await fs.writeFile(contactsPath, JSON.stringify(newContact));
-  return updatedContact;
+  const index = data.findIndex((item) => item.id === contactId);
+  if (index === -1) return null;
+  data[index] = {
+    ...data[index],
+    ...body,
+  };
+  fs.writeFile(contactsPath, JSON.stringify(data, null, 2));
+  return data[index];
 };
 
 module.exports = {
