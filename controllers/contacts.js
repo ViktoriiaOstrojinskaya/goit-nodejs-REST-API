@@ -1,10 +1,10 @@
-const Contact = require("../models/shemaMongoose/contact");
+const contactSchema = require("../models/shemas/contact");
 const { ctrlWrapper } = require("../helpers");
 
 // const { HttpError, ctrlWrapper } = require("../helpers");
 
 const getAll = async (req, res) => {
-  const data = await Contact.find();
+  const data = await contactSchema.find();
   res.status(200).json({ contacts: data });
 };
 
