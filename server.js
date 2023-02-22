@@ -7,10 +7,11 @@ const {
   DB_HOST = "mongodb+srv://viktoriia_ostrozhynska:aa2356ah@cluster0.whus9qg.mongodb.net/db-contacts?retryWrites=true&w=majority",
 } = process.env;
 
+mongoose.set("strictQuery", true);
+
 mongoose
   .connect(DB_HOST)
   .then(() => {
-    console.log(DB_HOST);
     console.log("Database connection successful");
     app.listen(PORT);
   })
