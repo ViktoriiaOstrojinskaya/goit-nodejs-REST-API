@@ -1,8 +1,7 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
-const { handleSchemaValidationError } = require("../../helpers");
+const { handleSchemaValidationError } = require("../helpers");
 
 const contactSchema = new Schema(
   {
@@ -52,14 +51,15 @@ const updateContactSchema = Joi.object({
   favorite: Joi.bool(),
 });
 
-const schemas = {
-  newContactSchema,
-  updateContactSchema,
-};
+const favoriteContactSchema = Joi.object({
+  favorite: Joi.bool().required(),
+});
 
-const Contact = mongoose.model("contact", contactSchema);
+const Contact = model("contact", contactSchema);
 
 module.exports = {
   Contact,
-  schemas,
+  newContactSchema,
+  updateContactSchema,
+  favoriteContactSchema,
 };
