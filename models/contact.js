@@ -1,7 +1,7 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
 
-const { handleSchemaValidationError } = require("../helpers");
+const { handleMongooseError } = require("../helpers");
 
 const contactSchema = new Schema(
   {
@@ -23,7 +23,7 @@ const contactSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-contactSchema.post("save", handleSchemaValidationError);
+contactSchema.post("save", handleMongooseError);
 
 const newContactSchema = Joi.object({
   name: Joi.string().alphanum().required(),
@@ -52,7 +52,7 @@ const updateContactSchema = Joi.object({
 });
 
 const favoriteContactSchema = Joi.object({
-  favorite: Joi.bool().required(),
+  favorite: Joi.bool(),
 });
 
 const Contact = model("contact", contactSchema);
