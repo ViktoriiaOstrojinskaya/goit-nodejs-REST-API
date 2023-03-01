@@ -1,4 +1,4 @@
-const { Conflict, Unauthorized } = require("http-errors");
+const { HttpError } = require("../helpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { ctrlWrapper } = require("../helpers");
@@ -10,27 +10,44 @@ const register = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
-    throw new Conflict(`Email ${email} in use`);
+    throw HttpError(409, `Email ${email} in use`);
   }
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
-  await User.create({ email, password: hashPassword });
-  res.status(201).json({ user: { email, password: hashPassword } });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+  });
+  res.status(201).json({
+    user: {
+      email: newUser.email,
+      subscription: newUser.subscription,
+    },
+  });
 };
 
 const login = async (req, res) => {
-  const { email, password, subscription } = req.body;
+  const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    throw new Unauthorized("Email is wrong");
+    throw HttpError(401, "Email or password is wrong");
   }
-  const passCompare = bcrypt.compareSync(password, user.password);
-  if (!passCompare) {
-    throw new Unauthorized("Password is wrong");
+  const isValidPassword = bcrypt.compareSync(password, user.password);
+  if (!isValidPassword) {
+    throw HttpError(401, "Email or password is wrong");
   }
-  const payload = { id: user._id };
-  const token = jwt.sign(payload, SECRET_KEY);
+  const payload = {
+    id: user._id,
+    subscription: user.subscription,
+  };
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1d" });
   await User.findByIdAndUpdate(user.id, { token });
-  res.json({ data: { token }, user: { email, subscription } });
+  res.json({
+    token,
+    user: {
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
 };
 
 const logout = async (req, res) => {
