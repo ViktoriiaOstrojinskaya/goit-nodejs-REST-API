@@ -2,7 +2,6 @@ const { HttpError } = require("../helpers");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { ctrlWrapper } = require("../helpers");
-const { currentUser } = require("../middlewares/index");
 const { User } = require("../models/user");
 const { SECRET_KEY } = process.env;
 
@@ -56,7 +55,10 @@ const logout = async (req, res) => {
   res.status(204).json();
 };
 
-const current = async (req, res) => {};
+const current = async (req, res) => {
+  const { email } = req.user;
+  res.status(200).json({ email });
+};
 
 module.exports = {
   register: ctrlWrapper(register),
