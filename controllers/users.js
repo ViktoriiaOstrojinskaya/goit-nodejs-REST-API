@@ -60,9 +60,26 @@ const current = async (req, res) => {
   res.status(200).json({ email, subscription });
 };
 
+const updateSubscriptionUser = async (req, res) => {
+  const { _id } = req.user;
+  const { subscription } = req.body;
+  const data = await User.findByIdAndUpdate(
+    _id,
+    { subscription },
+    {
+      new: true,
+    }
+  );
+  if (!data) {
+    throw HttpError(404, "Not found");
+  }
+  res.status(200).json(data);
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   logout: ctrlWrapper(logout),
   current: ctrlWrapper(current),
+  updateSubscriptionUser: ctrlWrapper(updateSubscriptionUser),
 };

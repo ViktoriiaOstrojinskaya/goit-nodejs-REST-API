@@ -34,11 +34,16 @@ const userJoiSchema = Joi.object({
       },
     })
     .required(),
-  subscription: Joi.string(),
+  subscription: Joi.string().valid("starter", "pro", "business"),
   token: Joi.string(),
+});
+
+const subscriptionUserSchema = Joi.object({
+  subscription: Joi.string().valid("starter", "pro", "business").required(),
 });
 
 module.exports = {
   User,
   userJoiSchema,
+  subscriptionUserSchema,
 };
