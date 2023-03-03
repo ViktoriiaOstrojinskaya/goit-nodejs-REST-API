@@ -14,7 +14,7 @@ const {
 
 router.get("/", authMiddleware, ctrl.getAll);
 
-router.get("/:contactId", isValidId, ctrl.getById);
+router.get("/:contactId", authMiddleware, isValidId, ctrl.getById);
 
 router.post(
   "/",
@@ -23,10 +23,11 @@ router.post(
   ctrl.postContact
 );
 
-router.delete("/:contactId", isValidId, ctrl.deleteById);
+router.delete("/:contactId", authMiddleware, isValidId, ctrl.deleteById);
 
 router.put(
   "/:contactId",
+  authMiddleware,
   isValidId,
   validateBody(updateContactSchema),
   ctrl.updateById
@@ -34,6 +35,7 @@ router.put(
 
 router.patch(
   "/:contactId/favorite",
+  authMiddleware,
   isValidId,
   validateBody(favoriteContactSchema),
   ctrl.updateStatusContact
