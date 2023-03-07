@@ -15,7 +15,7 @@ const register = async (req, res) => {
   if (user) {
     throw HttpError(409, `Email ${email} in use`);
   }
-  const avatarURL = gravatar.url(email);
+  const avatarURL = gravatar.url(email, {}, false);
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   const newUser = await User.create({
     ...req.body,
@@ -83,7 +83,7 @@ const updateSubscriptionUser = async (req, res) => {
   res.status(200).json(data);
 };
 
-const avatarDir = path.join(__dirname, "../../", "public", "avatars");
+const avatarDir = path.join(__dirname, "../public/avatars");
 
 const updateAvatarUser = async (req, res) => {
   const { path: tmpUpload, originalname } = req.file;
@@ -92,7 +92,7 @@ const updateAvatarUser = async (req, res) => {
   try {
     const resultUpload = path.join(avatarDir, imgName);
     await fs.rename(tmpUpload, resultUpload);
-    const avatarURL = path.join("public", "avatars", imgName);
+    const avatarURL = path.join("avatars", imgName);
     await User.findByIdAndUpdate(req.user._id, { avatarURL });
     res.status(200).json({ avatarURL });
   } catch (error) {

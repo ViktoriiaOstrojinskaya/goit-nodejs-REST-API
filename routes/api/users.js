@@ -15,7 +15,7 @@ router.patch(
   ctrl.updateSubscriptionUser
 );
 router.patch(
-  "/users/avatars",
+  "/avatars",
   authMiddleware,
   upload.single("avatar"),
   ctrl.updateAvatarUser
