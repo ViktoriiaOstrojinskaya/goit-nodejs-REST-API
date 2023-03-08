@@ -14,6 +14,7 @@ router.patch(
   validateBody(subscriptionUserSchema),
   ctrl.updateSubscriptionUser
 );
+
 router.patch(
   "/avatars",
   authMiddleware,

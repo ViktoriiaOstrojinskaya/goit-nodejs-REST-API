@@ -10,14 +10,17 @@ const { ctrlWrapper } = require("../helpers");
 const { User } = require("../models/user");
 const { SECRET_KEY } = process.env;
 
+const avatarDir = path.join(__dirname, "../public/avatars");
+
 const register = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, `Email ${email} in use`);
   }
-  const avatarURL = gravatar.url(email, {}, false);
   const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+  const avatarURL = gravatar.url(email, {}, false);
+
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
@@ -84,21 +87,26 @@ const updateSubscriptionUser = async (req, res) => {
   res.status(200).json(data);
 };
 
-const avatarDir = path.join(__dirname, "../public/avatars");
-
 const updateAvatarUser = async (req, res) => {
-  const { path: tmpUpload, originalname } = req.file;
+  const { path: tempUpload, originalname } = req.file;
   const { _id: id } = req.user;
-  const imgName = `${id}_${originalname}`;
+  const fileName = `${id}_${originalname}`;
   try {
-    const resultUpload = path.join(avatarDir, imgName);
-
-    await fs.rename(tmpUpload, resultUpload);
-    const avatarURL = path.join("avatars", imgName);
+    const image = await Jimp.read(tempUpload);
+    await image
+      .cover(
+        250,
+        250,
+        Jimp.HORIZONTAL_ALIGN_CENTER | Jimp.VERTICAL_ALIGN_MIDDLE
+      )
+      .writeAsync(tempUpload);
+    const resultUpload = path.join(avatarDir, fileName);
+    await fs.rename(tempUpload, resultUpload);
+    const avatarURL = path.join("public", "avatars", fileName);
     await User.findByIdAndUpdate(req.user._id, { avatarURL });
     res.status(200).json({ avatarURL });
   } catch (error) {
-    await fs.unlink(tmpUpload);
+    await fs.unlink(tempUpload);
     throw error;
   }
 };
