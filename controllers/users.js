@@ -8,7 +8,7 @@ const uuid = require("uuid");
 
 const { HttpError, ctrlWrapper, sendEmail } = require("../helpers");
 const { User } = require("../models/user");
-const { SECRET_KEY } = process.env;
+const { SECRET_KEY, BASE_URL } = process.env;
 
 const avatarDir = path.join(__dirname, "../public/avatars");
 
@@ -18,7 +18,7 @@ const register = async (req, res) => {
   if (user) {
     throw HttpError(409, `Email ${email} in use`);
   }
-  const hashPassword = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+  const hashPassword = await bcrypt.hashSync(password, bcrypt.genSaltSync(10));
   const avatarURL = gravatar.url(email, {}, false);
   const verificationToken = uuid.v4();
 
@@ -28,12 +28,12 @@ const register = async (req, res) => {
     avatarURL,
     verificationToken,
   });
-  const mail = {
+  const verifyEmail = {
     to: email,
-    subject: "Verification the user",
-    html: `<a href="http://localhost:3000/api/users/verify/${verificationToken} target="_blank">Click to confirm</a>`,
+    subject: "Verify you email",
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click to verify email</a>`,
   };
-  await sendEmail(mail);
+  await sendEmail(verifyEmail);
   res.status(201).json({
     user: {
       email: newUser.email,
@@ -49,13 +49,14 @@ const login = async (req, res) => {
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
   }
-  const isValidPassword = bcrypt.compareSync(password, user.password);
-  if (!isValidPassword) {
-    throw HttpError(401, "Email or password is wrong");
-  }
   if (!user.verify) {
     throw HttpError(401, "User not verify");
   }
+  const isValidPassword = await bcrypt.compareSync(password, user.password);
+  if (!isValidPassword) {
+    throw HttpError(401, "Email or password is wrong");
+  }
+
   const payload = {
     id: user._id,
     subscription: user.subscription,
@@ -147,12 +148,12 @@ const resendVerificationEmailUser = async (req, res) => {
   if (Object.keys(req.body).length === 0) {
     throw HttpError(400, "Missing required field email");
   }
-  const mail = {
+  const verifyEmail = {
     to: email,
-    subject: "Verification the user",
-    html: `<a href="http://localhost:3000/api/users/verify/${user.verificationToken} target="_blank">Click to confirm</a>`,
+    subject: "Verify you email",
+    html: `<a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click to verify email</a>`,
   };
-  await sendEmail(mail);
+  await sendEmail(verifyEmail);
   res.status(200).json({ message: "Verification email sent" });
 };
 
