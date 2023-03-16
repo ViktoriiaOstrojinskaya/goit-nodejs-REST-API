@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt");
+const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
@@ -18,7 +18,10 @@ const register = async (req, res) => {
   if (user) {
     throw HttpError(409, `Email ${email} in use`);
   }
-  const hashPassword = await bcrypt.hashSync(password, bcrypt.genSaltSync(10));
+  const hashPassword = await bcryptjs.hashSync(
+    password,
+    bcryptjs.genSaltSync(10)
+  );
   const avatarURL = gravatar.url(email, {}, false);
   const verificationToken = uuid.v4();
 
@@ -52,7 +55,7 @@ const login = async (req, res) => {
   if (!user.verify) {
     throw HttpError(401, "User not verify");
   }
-  const isValidPassword = await bcrypt.compareSync(password, user.password);
+  const isValidPassword = await bcryptjs.compareSync(password, user.password);
   if (!isValidPassword) {
     throw HttpError(401, "Email or password is wrong");
   }
