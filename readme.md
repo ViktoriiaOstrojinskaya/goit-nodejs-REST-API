@@ -1,31 +1,21 @@
-## GoIT Node.js Course Template Homework
+## Branch "hw02-express" - work with Express:
+1. Created web server on express and layers morgan and cors. 
+2. Started configuring routing to work with a collection of contacts (used HTTP-methods GET/POST/PUT/PUTCH/DELETE).
+3. Used the Joi package to validation data.
 
-Виконайте форк цього репозиторію для виконання домашніх завдань (2-6)
-Форк створить репозиторій на вашому http://github.com
+## Branch "hw03-mongodb" - work with MongoDB and Mongoose:
+1. Created database with collection "contacts" and routers.
+2. In the functions of processing requests, replaced the code of CRUD operations on contacts from a file with Mongoose methods for working with a collection of contacts in the database.
 
-Додайте ментора до колаборації
+## Branch "hw04-auth" - work with authentication/authorization user with JWT:
+1. Create endpoint /register, /login, /logout, /current.
+2. Used the bcryptjs package to salt passwords.
 
-Для кожної домашньої роботи створюйте свою гілку.
+## Branch "hw05-avatars" - work with Multer:
+1. Added the ability to download/change of the user's avatar.
 
-- hw02
-- hw03
-- hw04
-- hw05
-- hw06
-
-Кожна нова гілка для др повинна робитися з master
-
-Після того, як ви закінчили виконувати домашнє завдання у своїй гілці, необхідно зробити пулл-реквест (PR). Потім додати ментора для рев'ю коду. Тільки після того, як ментор заапрувить PR, ви можете виконати мердж гілки з домашнім завданням у майстер.
-
-Уважно читайте коментарі ментора. Виправте зауваження та зробіть коміт у гілці з домашнім завданням. Зміни підтягнуться у PR автоматично після того, як ви відправите коміт з виправленнями на github
-Після виправлення знову додайте ментора на рев'ю коду.
-
-- При здачі домашньої роботи є посилання на PR
-- JS-код чистий та зрозумілий, для форматування використовується Prettier
-
-### Команди:
-
-- `npm start` &mdash; старт сервера в режимі production
-- `npm run start:dev` &mdash; старт сервера в режимі розробки (development)
-- `npm run lint` &mdash; запустити виконання перевірки коду з eslint, необхідно виконувати перед кожним PR та виправляти всі помилки лінтера
-- `npm lint:fix` &mdash; та ж перевірка лінтера, але з автоматичними виправленнями простих помилок
+## Branch "hw06-email" - work with SendGrid service and Docker:
+1. Added verification of the user's email after registration.
+2. Added sending an email to the user with a link for verification.
+3. Added resending an email to the user with a link for verification.
+4. Writed a dockerfile for the application.
